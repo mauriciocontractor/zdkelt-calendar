@@ -372,14 +372,9 @@ Custom property             | Default                            | Description
                     (this.maxDate && sel > this.maxDate)) {
                     return;
                 }
-
-                if (this.value !== evt.model.item.dateStr) {
-                    this.value = evt.model.item.dateStr;
-                    this.fire("change", evt.model.item.date);
-                } else {
-                    this.value = null;
-                    this.fire("change", null);
-                }
+                
+                this.value = evt.model.item.dateStr;
+                this.fire("change", evt.model.item.date);
             },
             /**
             * show the year dropdown
