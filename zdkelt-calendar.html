@@ -307,7 +307,7 @@ Custom property             | Default                            | Description
                 _years: {
                     type: Array,
                     value: function() {
-                        var years = []
+                        var years = [];
                         for (var i = 1900; i < 2100; i++) {
                             years.push(i);
                         }
@@ -331,7 +331,7 @@ Custom property             | Default                            | Description
                     this._weekDays.push(this._weekDays.shift());
                 }
                 this._month = moment.monthsShort()[moment(this._date).month()];
-                this._year = moment(this._date).year()
+                this._year = moment(this._date).year();
                 fDay = moment(this._date).startOf('month').startOf('week');
 
                 for (w = 0; w < 6; w++) {
@@ -396,7 +396,7 @@ Custom property             | Default                            | Description
                         block: "start",
                         behavior: "smooth"
                     });
-                })
+                });
                 dlg.toggle();
             },
             /**
@@ -478,11 +478,11 @@ Custom property             | Default                            | Description
                 }
 
                 if (oldValue) {
-                    sel = this.querySelector('.select')
+                    sel = this.querySelector('.select');
                     if (sel) sel.classList.toggle('select');
                 }
                 if (newValue) {
-                    sel = this.querySelector('[data-date="' + newValue + '"]')
+                    sel = this.querySelector('[data-date="' + newValue + '"]');
                     if (sel && !sel.classList.contains("select")) sel.classList.add("select");
                 }
             },
