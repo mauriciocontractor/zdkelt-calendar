@@ -89,6 +89,7 @@ Custom property             | Default                            | Description
 
         .disabled {
             background: lightgray;
+            @apply(--zdk-calendar-disabled);
         }
 
         .day > div {
@@ -100,6 +101,7 @@ Custom property             | Default                            | Description
         .day:hover > div {
             background: lightgray;
             color: black;
+            @apply(--zdk-calendar-day-hover);
         }
 
         .years div.select,
@@ -138,6 +140,7 @@ Custom property             | Default                            | Description
             font-weight: bold;
             flex: 5;
             @apply(--layout-vertical);
+            @apply(--zdk-calendar-day-title);            
         }
 
         .title {
