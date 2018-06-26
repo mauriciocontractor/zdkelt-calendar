@@ -140,7 +140,7 @@ Custom property             | Default                            | Description
             font-weight: bold;
             flex: 5;
             @apply(--layout-vertical);
-            @apply(--zdk-calendar-day-title);            
+            @apply(--zdk-calendar-day-title);
         }
 
         .title {
@@ -316,6 +316,15 @@ Custom property             | Default                            | Description
                         }
                         return years;
                     }
+                },
+                disabledDays: {
+                  type: Array,
+                  value: function() {
+                    return [];
+                  }
+                },
+                disableWeekends: {
+                  type: Boolean
                 }
             },
             /**
@@ -342,8 +351,12 @@ Custom property             | Default                            | Description
                         days: []
                     };
                     for (d = 0; d < 7; d++) {
-                        disabled = (this.minDate && fDay.format("YYYY-MM-DD") < moment(this.minDate).format("YYYY-MM-DD")) ||
-                            (this.maxDate && fDay.format("YYYY-MM-DD") > moment(this.maxDate).format("YYYY-MM-DD"));
+                        disabled = (this.minDate && fDay.format("YYYY-MM-DD") < moment(this.minDate).format("YYYY-MM-DD"))
+                                   || (this.maxDate && fDay.format("YYYY-MM-DD") > moment(this.maxDate).format("YYYY-MM-DD"))
+                                   || (this.disabledDays && this.disabledDays.indexOf(fDay.format("YYYY-MM-DD")) > -1)
+                                   || (this.disableWeekends && d > 4);
+
+
                         week.days.push({
                             day: fDay.date(),
                             dateStr: fDay.format("YYYY-MM-DD"),
@@ -371,11 +384,18 @@ Custom property             | Default                            | Description
              */
             _selectDate: function(evt) {
                 var sel = moment(evt.model.item.dateStr).format("YYYY-MM-DD");
-                if ((this.minDate && sel < this.minDate) ||
-                    (this.maxDate && sel > this.maxDate)) {
+                var isDisabled = false;
+
+                if (evt.model.item.class.indexOf('disabled') > -1) {
+                  isDisabled = true;
+                }
+
+                if ((this.minDate && sel < this.minDate)
+                    || (this.maxDate && sel > this.maxDate)
+                    || isDisabled) {
                     return;
                 }
-                
+
                 this.value = evt.model.item.dateStr;
                 this.fire("change", evt.model.item.date);
             },
