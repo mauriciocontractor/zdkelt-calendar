@@ -89,6 +89,7 @@ Custom property             | Default                            | Description
 
         .disabled {
             background: lightgray;
+            @apply(--zdk-calendar-disabled);
         }
 
         .day > div {
@@ -100,6 +101,7 @@ Custom property             | Default                            | Description
         .day:hover > div {
             background: lightgray;
             color: black;
+            @apply(--zdk-calendar-day-hover);
         }
 
         .years div.select,
@@ -138,6 +140,7 @@ Custom property             | Default                            | Description
             font-weight: bold;
             flex: 5;
             @apply(--layout-vertical);
+            @apply(--zdk-calendar-day-title);
         }
 
         .title {
@@ -150,7 +153,7 @@ Custom property             | Default                            | Description
             flex: 1
         }
 
-        .dropdown-content {
+        .zdkCal .dropdown-content {
             background-color: white;
             line-height: 20px;
             border-radius: 3px;
@@ -307,12 +310,25 @@ Custom property             | Default                            | Description
                 _years: {
                     type: Array,
                     value: function() {
-                        var years = []
+                        var years = [];
                         for (var i = 1900; i < 2100; i++) {
                             years.push(i);
                         }
                         return years;
                     }
+                },
+                enableChangeYears: {
+                  type: Boolean,
+                  reflectToAttribute: true
+                },
+                disabledDays: {
+                  type: Array,
+                  value: function() {
+                    return [];
+                  }
+                },
+                disableWeekends: {
+                  type: Boolean
                 }
             },
             /**
@@ -331,7 +347,7 @@ Custom property             | Default                            | Description
                     this._weekDays.push(this._weekDays.shift());
                 }
                 this._month = moment.monthsShort()[moment(this._date).month()];
-                this._year = moment(this._date).year()
+                this._year = moment(this._date).year();
                 fDay = moment(this._date).startOf('month').startOf('week');
 
                 for (w = 0; w < 6; w++) {
@@ -339,8 +355,12 @@ Custom property             | Default                            | Description
                         days: []
                     };
                     for (d = 0; d < 7; d++) {
-                        disabled = (this.minDate && fDay.format("YYYY-MM-DD") < moment(this.minDate).format("YYYY-MM-DD")) ||
-                            (this.maxDate && fDay.format("YYYY-MM-DD") > moment(this.maxDate).format("YYYY-MM-DD"));
+                        disabled = (this.minDate && fDay.format("YYYY-MM-DD") < moment(this.minDate).format("YYYY-MM-DD"))
+                                   || (this.maxDate && fDay.format("YYYY-MM-DD") > moment(this.maxDate).format("YYYY-MM-DD"))
+                                   || (this.disabledDays && this.disabledDays.indexOf(fDay.format("YYYY-MM-DD")) > -1)
+                                   || (this.disableWeekends && d > 4);
+
+
                         week.days.push({
                             day: fDay.date(),
                             dateStr: fDay.format("YYYY-MM-DD"),
@@ -368,23 +388,26 @@ Custom property             | Default                            | Description
              */
             _selectDate: function(evt) {
                 var sel = moment(evt.model.item.dateStr).format("YYYY-MM-DD");
-                if ((this.minDate && sel < this.minDate) ||
-                    (this.maxDate && sel > this.maxDate)) {
+                var isDisabled = false;
+
+                if (evt.model.item.class.indexOf('disabled') > -1) {
+                  isDisabled = true;
+                }
+
+                if ((this.minDate && sel < this.minDate)
+                    || (this.maxDate && sel > this.maxDate)
+                    || isDisabled) {
                     return;
                 }
 
-                if (this.value !== evt.model.item.dateStr) {
-                    this.value = evt.model.item.dateStr;
-                    this.fire("change", evt.model.item.date);
-                } else {
-                    this.value = null;
-                    this.fire("change", null);
-                }
+                this.value = evt.model.item.dateStr;
+                this.fire("change", evt.model.item.date);
             },
             /**
             * show the year dropdown
             */
             _showYears: function(evt) {
+              if(this.enableChangeYears) {
                 var dlg = this.querySelector("#showYears");
                 var tmp;
                 if(tmp = dlg.querySelector('.select')) {
@@ -401,8 +424,9 @@ Custom property             | Default                            | Description
                         block: "start",
                         behavior: "smooth"
                     });
-                })
+                });
                 dlg.toggle();
+              }
             },
             /**
             * close the year dropdown when the mouse is out
@@ -483,11 +507,11 @@ Custom property             | Default                            | Description
                 }
 
                 if (oldValue) {
-                    sel = this.querySelector('.select')
+                    sel = this.querySelector('.select');
                     if (sel) sel.classList.toggle('select');
                 }
                 if (newValue) {
-                    sel = this.querySelector('[data-date="' + newValue + '"]')
+                    sel = this.querySelector('[data-date="' + newValue + '"]');
                     if (sel && !sel.classList.contains("select")) sel.classList.add("select");
                 }
             },
