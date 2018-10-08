@@ -317,6 +317,10 @@ Custom property             | Default                            | Description
                         return years;
                     }
                 },
+                enableChangeYears: {
+                  type: Boolean,
+                  reflectToAttribute: true
+                },
                 disabledDays: {
                   type: Array,
                   value: function() {
@@ -403,6 +407,7 @@ Custom property             | Default                            | Description
             * show the year dropdown
             */
             _showYears: function(evt) {
+              if(this.enableChangeYears) {
                 var dlg = this.querySelector("#showYears");
                 var tmp;
                 if(tmp = dlg.querySelector('.select')) {
@@ -421,6 +426,7 @@ Custom property             | Default                            | Description
                     });
                 });
                 dlg.toggle();
+              }
             },
             /**
             * close the year dropdown when the mouse is out
